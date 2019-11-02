@@ -1,0 +1,238 @@
+---
+title: "Assignment 5"
+author: "Danielle Quinn"
+date: "29/10/2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+**Assignment 5**  
+
+*Description of the Dataset:*  
+The data contained in the file `mydata.csv` has 205 observations and 7 variables and is a modified version of the `melanoma` dataset found in the `boot` package. The data consist of measurements made on patients with malignant melanoma. Each patient had their tumour removed by surgery at the Department of Plastic Surgery, University Hospital of Odense, Denmark during the period 1962 to 1977. The dataset includes survival time in days, patient information including status, age, and sex, and tumor information including thickness.  
+
+**Question 1: Preparing Your Workspace**
+
+*Context:*  
+This assignment will use data and functions found in the `dplyr` and `ggplot2` packages, which can be loaded using the `library()` function. 
+
+*Instructions:*  
+- Load the required packages.  
+- Access the data contained in the file `mydata.csv` and store it in an object called `mydata`.  
+- Print the first six rows of the data frame.  
+- Generate a summary of each column using `summary()` and store it in an object called `mysummary`.  
+- Look at the structure of the data frame using `str()` or `glimpse()`.    
+
+*Assignment Code:*  
+```{r}
+# Load packages
+
+
+# Access data
+
+
+# Print the first six rows
+
+
+# Generate summary statistics
+
+
+# Look at the structure of the object
+
+```
+
+*Feedback:*  
+You will be using this dataset to explore concepts about probability and statistics.  
+
+**Question 2: Generating Density Plots**  
+
+*Context:*  
+The Normal Distribution has some great properties for our analysis, it's a fantastic tool in our tool belt as data scientists. It can be specified by just two variables; the mean and standard deviation. However, it is important to be able to assess whether values in the data set follow the Normal Distribution or not. Density plots created using `geom_density()` are a good way to carefully look at the data. This function is very similar to `geom_histogram()`, and requires only an x variable. Here, you will also be introduced to using the argument `alpha` to control the transparency of the density plot, and `fill` to control the fill colour.  
+
+*Instructions:*  
+- Use `set.seed(123)` to ensure reproducibility.  
+- Using `mutate()`, add a new column to `mydata` called `normal_thickness` and populate (fill in) this column with values taken from a normal distribution that has the same mean and standard deviation found in the `thickness` column of `mydata`. Use `?rnorm` if you need a quick reminder of how the function works.  
+- Generate a densty plot of `age` using `geom_density()`. Specify that the `fill` colour should be `"blue"` and the `alpha` should be `0.2`, making it slightly transparent. Store this ggplot in an object called `plot1`.  
+- Generate a densty plot of `thickness` using `geom_density()`. Specify that the `fill` colour should be `"red"` and the `alpha` should be `0.2`, making it slightly transparent. Store this ggplot in an object called `plot2`.  
+- Add a `geom_density()` layer to `plot2` that displays the distribution of `normal_thickness`.  Specify that the `fill` colour should be `"green"` and the `alpha` should be `0.2`, making it slightly transparent. Store this plot in an object called `plot3`. Think about how this compares to the actual distribution of `thickness` and what it tells you about the data.  
+
+*Assignment Code:*  
+```{r}
+# Set seed
+
+
+# Add normal_thickness column to mydata
+
+
+# Generate density plot of age
+
+
+# Look at plot1
+
+
+# Generate density plot of thickness
+
+
+# Look at plot2
+
+
+# Overlay density plot of normal_thickness
+
+
+# Look at plot3
+
+```
+
+*Feedback:*  
+You can see from the density plots that while `age` is fairly close to being normally distributed, `thickness` is not. This is even clearer when a normal distribution is overlayed on the density plot of `thickness`! Understanding the distribution of the variables is an important consideration when deciding what analytical approaches should be used. It should be noted that in some instances, using the natural logarithm of a variable may result in a more normally distributed variable and is a useful technique. You can calculate the natural logarithm of `thickness` using `log()` to demonstrate this concept.  
+
+**Question 3: Visualizing the Cumulative Distribution Function** 
+
+*Context:*  
+The Cumulative Distribution Function (CDF) is an important technique in many contexts, such as allocating reserves for a pension scheme. In that instance, the CDF of survival rates of policy holders would be valuable information. Here, you will look at the CDF of the thickness of melanoma cells using a specialized function from `ggplot2`, the `stat_ecdf()` function. This function can be added to `ggplot()` instead of a typical `geom_` function. Just like a `geom_` function, `stat_ecdf()` requires an `aes()` function as its first argument, and it is here the x axis variable is specified using the appropriate column name.  
+
+*Instructions:* 
+- Plot the CDF of the `thickness` of melanoma cells as a `ggplot()` using the `stat_ecdf()` layer. Store this plot in an object called `plot4`.    
+- Looking at this plot, approximately what proportion (*to the nearest 0.25*) of melanoma cells are less than 4 mm thick? Store this value in an object called `estimated_proportion`.
+
+*Assignment Code:*  
+
+```{r}
+# CDF of melanoma thickness
+
+
+# Look at plot4
+
+
+# Estimate proportion < 4 mm to the nearest 0.25
+
+```
+
+*Feedback:*  
+The shape of this curve indicates that the `thickness` variable is not normally distributed; you can see that approximately 95 % of points fall below the midpoint of `thickness` (approximately 9 mm).  
+
+**Question 4: Calculating Overall Statistics**  
+
+*Context:*  
+You are interested in learning about the proportion of patients that fall into each level of `status`. Later you will sample the population and compare the values generated by that sample to the values found here using the full data set.  
+
+*Instructions:*  
+- Use `levels()` to examine the unique values found in the `status` column of `mydata`. Recall that `levels()` requires a factor vector as its only argument.  
+- Use `dplyr` to generate a summary table that contains the proportion of records in `mydata` containing each value of `status`. This table should have two columns: `status` and `proportion`, and be stored in an object called `overall_values`.  
+Hint: The proportion will be equal to the number of occurances of each level of `status` divided by the total number of rows in `mydata`. Consider how you might use `group_by()`, `summarise()`, `n()`, and `nrow()` to accomplish this task.  
+
+```{r}
+# Levels of status
+
+
+# Generate overall_values
+
+
+# Look at overall_values
+
+```
+
+**Question 5: Simple Random Sampling**  
+
+*Context:*  
+Sampling a population is a common analytical task. The easiest way to do this is using simple random sampling. Values calculated using the full dataset should be comparable to those calculated using a random sample of the dataset. Here, you will calculate the proportion of the data that falls into each level of `status`.  
+
+*Instructions:*  
+- Use `set.seed(123)` to ensure reproducibility.  
+- Subset a simple random sample of 30 patients using `sample_n()`. Store this subset in an object called `mysimple`.  
+- Generate a summary table that contains the proportion of records in `mysimple` with each level of `status`. It should have two columns: `status` and `proportion`. Store this data frame in an object called `simple_values`.  
+
+*Assignment Code:*  
+```{r}
+# Set seed
+
+
+# Random sample of 30 patients
+
+
+# Find the proportion of patients at each status using the random sample
+
+
+# Look at simple_values
+
+```
+
+*Feedback:*  
+Taking a small random sample from a large population will result in slightly different estimates. Simple random sampling is the most straightforward method, but there are instances where you will want to sample the data to produce a subset that is more reflective of the larger population.  
+
+**Question 6: Stratified Random Sampling**  
+
+*Context:*  
+Stratified random sampling occurs when a variable in the data is used to direct how the population is sampled. This variable typically relates to some structural characteristic of the population that you want to be reflected in the subset used for analysis. For example, 62 % of the patients in the `mydata` data set are male. Therefore, a simple random sample of the data would likely contain more male patients than female. If you wanted to ensure that the subset contains an equal number of males and females, you would use stratified random sampling.  
+
+*Instructions:*  
+- Use `set.seed(123)` to ensure reproducibility.  
+- Subset a random sample of 30 patients using `sample_n()`. Ensure that this subset includes an equal number of males and females by including `group_by`() in the `dplyr` pipeline. Store this subset in an object called `mystratified`.  
+- Generate a summary table that contains the proportion of patients in each level of `status` using the subset `mystratified`. It should have two columns: `status` and `proportion`. Store this data frame in an object called `stratified_values`.  
+
+*Please note that small sample sizes like the ones demonstrated here are not reliable for inference! Here, we are only illustrating the process of how to generate a random stratified sample.*  
+
+*Assignment Code:*  
+```{r}
+# Set seed
+
+
+# Stratified random sample of 15 records from each level of sex
+
+
+# Find the proportion of patients at each status using the random sample
+
+
+# Look at stratified_values
+
+```
+
+*Feedback:*  
+Stratified random sampling is a method of extracing a subset of a population in proportion to another variable.  
+
+**Question 7: Calculating Confidence Limits**  
+
+*Context:*  
+Typically, the confidence interval will provide you with the upper and lower ranges where our sample statistic (like a mean, or variance for example) will fall within 95 % of the time. While 95 % is the most commonly used value, it may be appropriate to be more conservative (i.e. 99 %) or less conservative (i.e. 80 %) depending on the question being asked. Here, you know that the `age` variable is approximately normally distributed, and will need to compute the 95 % confidence interval around the mean `age`.  
+
+*Instructions:* 
+- Find the mean value of `age` in `mydata`; store this in an object called `mu`.  
+- Find the standard deviation of `age` in `mydata`; store this in an object called `sigma`.  
+- Find the number of samples of `age` in `mydata`; store this in an object called `n`.  
+- Calculate the error using `sigma`, and `n`, and the function `qnorm()`; store this in an object called `error`.  
+- Find the lower confidence limit by subtracting `error` from `mu`; store this in an object called `lower`.  
+- Find the upper confidence limit by adding `error` to `mu`; store this in an object called `upper`.  
+
+*Assignment Code:*  
+```{r}
+# Mean age
+
+
+# Standard deviation of age
+
+
+# Number of samples
+
+
+# Calculate error
+
+
+# Lower confidence limit
+
+
+# Upper confidence limit
+
+
+# Look at mu
+
+
+# Look at lower
+
+
+# Look at upper
+
+```
+
+*Feedback:*  
+Remember that the dataset is itself a random sample from a larger population. You can use this confidence interval to predict that 95 % of the time, the mean age of patients will lie between the lower and upper limits.
