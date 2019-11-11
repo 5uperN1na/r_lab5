@@ -1,6 +1,6 @@
 ---
 title: "Assignment 5"
-author: "Danielle Quinn"
+author: "Paula Suarez"
 date: "29/10/2019"
 output: html_document
 editor_options: 
@@ -26,19 +26,31 @@ This assignment will use data and functions found in the `dplyr` and `ggplot2` p
 
 *Assignment Code:*  
 ```{r}
+
+#Set working directory
+#getwd()
+setwd( "C:/Users/suarep/Documents/pds/dataScience/gitRepo/lab5/r_lab5")
+
 # Load packages
+library(dplyr)
+library(ggplot2)
 
 
 # Access data
-
+#Access the data contained in the file `mydata.csv` and store it in an object called `mydata`. 
+mydata <- read.csv("mydata.csv")
 
 # Print the first six rows
-
+head(mydata)
 
 # Generate summary statistics
-
+#Generate a summary of each column using `summary()` and store it in an object called `mysummary`. 
+mysummary <-summary(mydata)
 
 # Look at the structure of the object
+glimpse(mysummary)
+str(mysummary)
+
 
 ```
 
@@ -59,31 +71,72 @@ The Normal Distribution has some great properties for our analysis, it's a fanta
 
 *Assignment Code:*  
 ```{r}
-# Set seed
 
+# Set seed
+#Use `set.seed(123)` to ensure reproducibility. 
+set.seed(123)
 
 # Add normal_thickness column to mydata
+#Using `mutate()`, add a new column to `mydata` called `normal_thickness` and populate (fill in) this column with values taken from a normal distribution that has the same mean and standard deviation found in the `thickness` column of `mydata`. Use `?rnorm` if you need a quick reminder of how the function works.
 
+?rnorm
+?mutate
+
+m <- mean(mydata$thickness)
+m
+
+s <- sd(mydata$thickness)
+s
+
+n <- nrow(mydata)
+n
+
+r <- rnorm(n, mean = m, sd = s)
+
+#option1
+#r <- rnorm(n, mean = mean(mydata$thickness), sd (mydata$thickness))
+
+#option2
+#mutate(mydata, normal_thickness = rnorm(n, mean = mean(mydata$thickness), sd (mydata$thickness)))
+
+#option3
+#mutate(mydata, normal_thickness = rnorm(n, mean = mean(thickness), sd(thickness)))
+
+#overwrite and add column to data set
+mydata <- mutate(mydata, normal_thickness = r)
+
+head(mydata)
 
 # Generate density plot of age
+#Generate a densty plot of `age` using `geom_density()`. Specify that the `fill` colour should be `"blue"` and the `alpha` should be `0.2`, making it slightly transparent. Store this ggplot in an object called 'plot1`.
 
+plot1 <- ggplot(mydata) +
+  geom_density(aes(x = age), alpha = 0.2, fill = "blue")
 
 # Look at plot1
-
+plot1
 
 # Generate density plot of thickness
+#Generate a densty plot of `thickness` using `geom_density()`. Specify that the `fill` colour should be `"red"` and the `alpha` should be `0.2`, making it slightly transparent. Store this ggplot in an object called `plot2`. 
 
+plot2 <- ggplot(mydata) +
+  geom_density(aes(x = thickness), alpha = 0.2, fill = "red")
 
 # Look at plot2
+plot2
 
 
 # Overlay density plot of normal_thickness
+#Add a `geom_density()` layer to `plot2` that displays the distribution of `normal_thickness`.  Specify that the `fill` colour should be `"green"` and the `alpha` should be `0.2`, making it slightly transparent. Store this plot in an object called `plot3`. Think about how this compares to the actual distribution of `thickness` and what it tells you about the data.
 
+
+plot3 <- plot2 +
+  geom_density(aes(x = normal_thickness), alpha = 0.2, fill = "green")
 
 # Look at plot3
+plot3
 
 ```
-
 *Feedback:*  
 You can see from the density plots that while `age` is fairly close to being normally distributed, `thickness` is not. This is even clearer when a normal distribution is overlayed on the density plot of `thickness`! Understanding the distribution of the variables is an important consideration when deciding what analytical approaches should be used. It should be noted that in some instances, using the natural logarithm of a variable may result in a more normally distributed variable and is a useful technique. You can calculate the natural logarithm of `thickness` using `log()` to demonstrate this concept.  
 
@@ -100,12 +153,18 @@ The Cumulative Distribution Function (CDF) is an important technique in many con
 
 ```{r}
 # CDF of melanoma thickness
+#Plot the CDF of the `thickness` of melanoma cells as a `ggplot()` using the `stat_ecdf()` layer. Store this plot in an object called `plot4`.
 
+
+plot4 <- ggplot(mydata, aes(thickness)) + stat_ecdf()
 
 # Look at plot4
-
+plot4
 
 # Estimate proportion < 4 mm to the nearest 0.25
+#Looking at this plot, approximately what proportion (*to the nearest 0.25*) of melanoma cells are less than 4 mm thick? Store this value in an object called `estimated_proportion`.
+
+estimated_proportion <- .75
 
 ```
 
@@ -124,12 +183,22 @@ Hint: The proportion will be equal to the number of occurances of each level of 
 
 ```{r}
 # Levels of status
+#Use `levels()` to examine the unique values found in the `status` column of `mydata`. Recall that `levels()` requires a factor vector as its only argument.
 
+levels(mydata$status)
 
 # Generate overall_values
+#Use `dplyr` to generate a summary table that contains the proportion of records in `mydata` containing each value of `status`. This table should have two columns: `status` and `proportion`, and be stored in an object called `overall_values`.  
+#Hint: The proportion will be equal to the number of occurances of each level of `status` divided by the total number of rows in `mydata`. Consider how you might use `group_by()`, `summarise()`, `n()`, and `nrow()` to accomplish this task. 
 
+levels(mydata$status)
+str(mydata)
+nlevels(mydata$status)
+
+overall_values <- mydata %>%   group_by(status) %>%   summarise(proportion = n() / nrow(mydata)) 
 
 # Look at overall_values
+overall_values
 
 ```
 
@@ -146,15 +215,22 @@ Sampling a population is a common analytical task. The easiest way to do this is
 *Assignment Code:*  
 ```{r}
 # Set seed
-
+#Use `set.seed(123)` to ensure reproducibility. 
+set.seed(123)
 
 # Random sample of 30 patients
-
+-#Subset a simple random sample of 30 patients using `sample_n()`. Store this subset in an object called `mysimple`. 
+  
+mysimple <- sample_n(mydata, 30)
+mysimple
 
 # Find the proportion of patients at each status using the random sample
+#Generate a summary table that contains the proportion of records in `mysimple` with each level of `status`. It should have two columns: `status` and `proportion`. Store this data frame in an object called `simple_values`.
 
-
+simple_values <- mysimple %>%   group_by(status) %>%   summarise(proportion = n()/nrow(mysimple)) 
+ 
 # Look at simple_values
+simple_values
 
 ```
 
@@ -176,15 +252,28 @@ Stratified random sampling occurs when a variable in the data is used to direct 
 *Assignment Code:*  
 ```{r}
 # Set seed
+#Use `set.seed(123)` to ensure reproducibility. 
+set.seed(123)
 
 
 # Stratified random sample of 15 records from each level of sex
+#Subset a random sample of 30 patients using `sample_n()`. Ensure that this subset includes an equal number of males and females by including `group_by`() in the `dplyr` pipeline. Store this subset in an object called `mystratified`.  
+
+mystratified <- mydata %>%
+  group_by(sex) %>%
+  sample_n(15)
+
+mystratified
 
 
 # Find the proportion of patients at each status using the random sample
+#Generate a summary table that contains the proportion of patients in each level of `status` using the subset `mystratified`. It should have two columns: `status` and `proportion`. Store this data frame in an object called `stratified_values`. 
 
+stratified_values <- mystratified %>%   group_by(status) %>%   summarise(proportion = n()/nrow(mystratified)) 
+ 
 
 # Look at stratified_values
+stratified_values
 
 ```
 
@@ -207,30 +296,45 @@ Typically, the confidence interval will provide you with the upper and lower ran
 *Assignment Code:*  
 ```{r}
 # Mean age
-
+#Find the mean value of `age` in `mydata`; store this in an object called `mu`.
+mu <- mean(mydata$age)
+mu
 
 # Standard deviation of age
+#Find the standard deviation of `age` in `mydata`; store this in an object called `sigma`
 
+sigma <- sd(mydata$age)
+sigma
 
 # Number of samples
+#Find the number of samples of `age` in `mydata`; store this in an object called `n`. 
 
+n <- nrow(mydata)
+n
 
 # Calculate error
+#Calculate the error using `sigma`, and `n`, and the function `qnorm()`; store this in an object called `error`. 
+
+error <- qnorm(0.975)*sigma/sqrt(n)
 
 
 # Lower confidence limit
+#Find the lower confidence limit by subtracting `error` from `mu`; store this in an object called `lower`.
+lower <- mu-error
 
 
 # Upper confidence limit
-
+#Find the upper confidence limit by adding `error` to `mu`; store this in an object called `upper`. 
+upper <- mu+error
 
 # Look at mu
-
+mu
 
 # Look at lower
-
+lower
 
 # Look at upper
+upper
 
 ```
 
